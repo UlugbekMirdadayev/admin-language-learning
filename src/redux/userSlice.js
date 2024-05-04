@@ -2,10 +2,10 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const postsSlice = createSlice({
   name: "user",
-  initialState: JSON.parse(localStorage.getItem("user-admin-restoran")) || {},
+  initialState: JSON.parse(localStorage.getItem("user-admin-language-learning")) || {},
   reducers: {
     setUser(_, { payload }) {
-      localStorage.setItem("user-admin-restoran", JSON.stringify(payload));
+      localStorage.setItem("user-admin-language-learning", JSON.stringify(payload));
       return payload;
     },
   },

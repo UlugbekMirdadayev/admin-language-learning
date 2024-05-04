@@ -55,6 +55,7 @@ const Students = () => {
         data={studentList}
         user={user}
         setLoader={(boolean) => dispatch(setLoader(boolean))}
+        getReport={getReport}
       />
     </div>
   );

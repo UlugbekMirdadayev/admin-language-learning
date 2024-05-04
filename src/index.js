@@ -15,7 +15,7 @@ import "@mantine/dates/styles.css";
 const root = createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>
-    <ToastContainer position="top-center" autoClose={500} />
+    <ToastContainer position="top-center" autoClose={2000} />
     <BrowserRouter>
       <MantineProvider theme={themes}>
         <Router />

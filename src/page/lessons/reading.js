@@ -74,10 +74,10 @@ function Reading({ handleUpdate, close, id }) {
       .then(({ data }) => {
         setLoading(false);
         form.setValues({
-          text: data?.text_question_set?.text,
+          text: data?.text_question_sets?.text,
         });
         setUpdate(
-          data?.text_question_set?.text ? data?.text_question_set?.id : false
+          data?.text_question_sets?.text ? data?.text_question_sets?.id : false
         );
       })
       .catch((error) => {

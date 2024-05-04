@@ -5,13 +5,17 @@ import Dashboard from "./page/students";
 import { Box, Center, Flex, Loader } from "@mantine/core";
 import { useLoader } from "./redux/selectors";
 import Lessons from "./page/lessons";
+import Login from "./page/admin/login";
 
 const routes = [
   {
     path: "/",
     element: <Dashboard />,
   },
-
+  {
+    path: "/login",
+    element: <Login />,
+  },
   {
     path: "/lessons",
     element: <Lessons />,

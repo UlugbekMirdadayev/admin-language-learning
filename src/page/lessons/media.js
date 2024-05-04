@@ -75,7 +75,7 @@ function Media({ handleUpdate, close, id }) {
     getRequest("/lessons/" + id, user?.token)
       .then(({ data }) => {
         setLoading(false);
-        setUpdate(data?.media_item?.id ? data?.media_item : false);
+        setUpdate(data?.media_items?.id ? data?.media_items : false);
       })
       .catch((error) => {
         setLoading(false);
@@ -129,7 +129,15 @@ function Media({ handleUpdate, close, id }) {
               }}
             />
           ) : (
-            ""
+            <iframe
+              width="100%"
+              height="100%"
+              src={update?.media_link}
+              title={update?.media_link}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            ></iframe>
           )
         ) : null}
         {form.values.media_type === "link" ? (

@@ -1,9 +1,9 @@
-import { Box, Button, Group, Input } from "@mantine/core";
+import { Box, Button, Group, Input, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
 // import { postRequest } from "../../services/api";
 // import { toast } from "react-toastify";
 import { useUser } from "../../redux/selectors";
-import { putRequest } from "../../services/api";
+import { postRequest, putRequest } from "../../services/api";
 import { toast } from "react-toastify";
 import { useState } from "react";
 
@@ -15,8 +15,8 @@ const inputs = [
   },
   {
     name: "description",
-    label: "Description",
-    as: Input,
+    label: "Objectivs",
+    as: Textarea,
   },
   {
     name: "index",
@@ -38,17 +38,31 @@ function FormCreate({ handleUpdate, close, defaultValues }) {
 
   const onSubmit = (values) => {
     setLoader(true);
-    putRequest(`/lessons/${defaultValues.id}`, values, user?.token)
-      .then(() => {
-        setLoader(false);
-        toast.success("Successfully updated");
-        handleUpdate(true);
-        close();
-      })
-      .catch((err) => {
-        setLoader(false);
-        console.log(err, "error");
-      });
+    if (defaultValues?.id) {
+      putRequest(`/lessons/${defaultValues?.id}`, values, user?.token)
+        .then(() => {
+          setLoader(false);
+          toast.success("Successfully updated");
+          handleUpdate(true);
+          close();
+        })
+        .catch((err) => {
+          setLoader(false);
+          console.log(err, "error");
+        });
+    } else {
+      postRequest(`/lessons`, values, user?.token)
+        .then(() => {
+          setLoader(false);
+          toast.success("Successfully created");
+          handleUpdate(true);
+          close();
+        })
+        .catch((err) => {
+          setLoader(false);
+          console.log(err, "error");
+        });
+    }
   };
 
   return (
@@ -62,7 +76,7 @@ function FormCreate({ handleUpdate, close, defaultValues }) {
             placeholder={input.label}
             disabled={input.disabled}
           >
-            <Input required {...form.getInputProps(input.name)} />
+            <input.as required {...form.getInputProps(input.name)} />
           </Input.Wrapper>
         ))}
         <Group justify="flex-end" mt="md">
