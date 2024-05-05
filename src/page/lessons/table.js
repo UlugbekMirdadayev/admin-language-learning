@@ -100,6 +100,8 @@ export default function TableComponent({
       </Table.Td>
       <Table.Td>
         <ModalScreen
+          disabledBtn={!element?.media_items?.id}
+          popupBtn={'Media Item Not Found'}
           title={"Translation"}
           btn_title={<PenIcon fill={"#fff"} />}
           body={({ close }) => (
@@ -128,6 +130,8 @@ export default function TableComponent({
       </Table.Td>
       <Table.Td>
         <ModalScreen
+          disabledBtn={!element?.media_items?.id}
+          popupBtn={'Media Item Not Found'}
           title={"Multiple Choice"}
           btn_title={<PenIcon fill={"#fff"} />}
           body={({ close }) => (

@@ -1,9 +1,15 @@
-import React, { useMemo } from "react";
-import { Route, Routes, useLocation, Navigate } from "react-router-dom";
+import React, { useEffect, useMemo } from "react";
+import {
+  Route,
+  Routes,
+  useLocation,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./page/students";
 import { Box, Center, Flex, Loader } from "@mantine/core";
-import { useLoader } from "./redux/selectors";
+import { useLoader, useUser } from "./redux/selectors";
 import Lessons from "./page/lessons";
 import Login from "./page/admin/login";
 
@@ -28,13 +34,21 @@ const routes = [
 ];
 
 export default function App() {
-  const loading = useLoader();
+  const navigate = useNavigate();
   const { pathname } = useLocation();
+  const user = useUser();
+  const loading = useLoader();
 
   const isHideSideBar = useMemo(
     () => ["/login"].includes(pathname),
     [pathname]
   );
+
+  useEffect(() => {
+    if (!user?.token) {
+      navigate("/login");
+    }
+  }, [user?.token, navigate]);
 
   return (
     <Flex maw={"100vw"} gap={20} gutter={0}>

@@ -10,8 +10,14 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useUser } from "../../redux/selectors";
-import { getRequest, postRequest } from "../../services/api";
-import { PenIcon } from "../../components/icon";
+import {
+  deleteRequest,
+  getRequest,
+  postRequest,
+  putRequest,
+} from "../../services/api";
+import { PenIcon, Trash } from "../../components/icon";
+import { toast } from "react-toastify";
 
 const inputs = [
   {
@@ -28,10 +34,22 @@ const inputs = [
   },
 ];
 
-const FormCard = ({ mediaId, lessonsId, handleUpdate, forms }) => {
-  const correct = forms?.answers.find(({ correct }) => correct);
+const FormCard = ({
+  mediaId,
+  lessonsId,
+  handleUpdate,
+  forms,
+  close,
+  choiceId,
+}) => {
+  const correct = forms?.answers
+    ?.map((answ, index) => {
+      return answ?.correct ? { ...answ, index } : false;
+    })
+    ?.filter(Boolean)[0];
   const user = useUser();
   const [loading, setLoading] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
   const form = useForm({
     initialValues: {
       question: forms?.content || "",
@@ -39,12 +57,11 @@ const FormCard = ({ mediaId, lessonsId, handleUpdate, forms }) => {
       b: forms?.answers[1]?.content || "",
       c: forms?.answers[2]?.content || "",
       d: forms?.answers[3]?.content || "",
-      current: correct?.id,
+      current: inputs[correct?.index]?.name,
     },
   });
 
   const onUpdate = (values) => {
-    if (values) return console.log(values);
     const multiple_question = {
       content: values.question,
       answers_attributes: [
@@ -55,8 +72,8 @@ const FormCard = ({ mediaId, lessonsId, handleUpdate, forms }) => {
       ],
     };
     setLoading(true);
-    postRequest(
-      `/lessons/${lessonsId}/media_items/${mediaId}/multiple_questions`,
+    putRequest(
+      `/lessons/${lessonsId}/media_items/${mediaId}/multiple_questions/${choiceId}`,
       { multiple_question },
       user?.token
     )
@@ -64,11 +81,33 @@ const FormCard = ({ mediaId, lessonsId, handleUpdate, forms }) => {
         setLoading(false);
         handleUpdate(true);
         console.log(data, "data");
+        toast.success("Updated");
         form.reset();
+        close()
       })
       .catch((err) => {
         setLoading(false);
         console.log(err, "err");
+      });
+  };
+
+  const handleDelete = () => {
+    setLoadingDelete(true);
+    deleteRequest(
+      `/lessons/${lessonsId}/media_items/${mediaId}/multiple_questions/${choiceId}`,
+      user?.token
+    )
+      .then(({ data }) => {
+        setLoadingDelete(false);
+        toast.info("Deleted");
+        console.log(data);
+        handleUpdate(true);
+        close();
+      })
+      .catch((err) => {
+        setLoadingDelete(false);
+        console.log(err);
+        toast.info(JSON.stringify(err?.response?.data || "Error"));
       });
   };
   return (
@@ -77,18 +116,32 @@ const FormCard = ({ mediaId, lessonsId, handleUpdate, forms }) => {
         <summary>
           <Flex align={"center"} justify={"space-between"} mt={"md"}>
             <p>{forms?.content}</p>
-            <Text
-              p={"sm"}
-              style={{
-                borderRadius: 4,
-                backgroundColor:
-                  "var(--button-bg, var(--mantine-primary-color-filled))",
-                height: 50,
-                cursor: "pointer",
-              }}
-            >
-              <PenIcon fill="#fff" />
-            </Text>
+            <Flex gap={"sm"}>
+              <Button
+                onClick={handleDelete}
+                loading={loadingDelete}
+                p={"sm"}
+                color="red"
+                style={{
+                  borderRadius: 4,
+                  height: 50,
+                }}
+              >
+                <Trash fill="#fff" />
+              </Button>
+              <Text
+                p={"sm"}
+                style={{
+                  borderRadius: 4,
+                  backgroundColor:
+                    "var(--button-bg, var(--mantine-primary-color-filled))",
+                  height: 50,
+                  cursor: "pointer",
+                }}
+              >
+                <PenIcon fill="#fff" />
+              </Text>
+            </Flex>
           </Flex>
         </summary>
         <TextInput
@@ -108,15 +161,15 @@ const FormCard = ({ mediaId, lessonsId, handleUpdate, forms }) => {
               w={55}
               h={35}
               labelPosition="left"
-              label={`${inputs[index].name})`}
-              value={inp.content}
+              label={`${inputs[index]?.name})`}
+              value={inputs[index]?.name}
               onChange={({ target: { checked } }) => {
                 checked &&
                   form.setValues({
-                    current: inp.content,
+                    current: inputs[index]?.name,
                   });
               }}
-              checked={form.values.current === inp.content}
+              checked={form.values.current === inputs[index]?.name}
             />
             <TextInput
               flex={1}
@@ -175,6 +228,7 @@ function MultipleChoice({ handleUpdate, close, id }) {
         setLoading(false);
         handleUpdate(true);
         console.log(data, "data");
+        toast.success("Created");
         form.reset();
         close();
       })
@@ -211,7 +265,7 @@ function MultipleChoice({ handleUpdate, close, id }) {
           rightSectionWidth={120}
           {...form.getInputProps("question")}
         />
-        {inputs.map((inp) => (
+        {inputs?.map((inp) => (
           <Flex align={"center"} justify={"space-between"} key={inp.name}>
             <Checkbox
               type="radio"
@@ -246,13 +300,15 @@ function MultipleChoice({ handleUpdate, close, id }) {
           </Button>
         </Group>
       </form>
-      {listArray.map((forms) => (
+      {listArray?.map((forms) => (
         <FormCard
           key={forms?.id}
           forms={forms}
           mediaId={mediaId}
           lessonsId={id}
           handleUpdate={handleUpdate}
+          choiceId={forms?.id}
+          close={close}
         />
       ))}
     </Box>

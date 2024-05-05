@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Modal } from "@mantine/core";
+import { Button, Modal, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 const ModalScreen = ({
@@ -8,7 +8,9 @@ const ModalScreen = ({
   body,
   color,
   onClose,
+  disabledBtn = false,
   defaultOpened,
+  popupBtn = "Click to open",
 }) => {
   const [opened, { open, close }] = useDisclosure(false);
   return (
@@ -23,9 +25,11 @@ const ModalScreen = ({
       >
         {body({ close, open })}
       </Modal>
-      <Button bg={color} onClick={open}>
-        {btn_title}
-      </Button>
+      <Tooltip label={popupBtn}>
+        <Button bg={color} onClick={open} disabled={disabledBtn}>
+          {btn_title}
+        </Button>
+      </Tooltip>
     </>
   );
 };
