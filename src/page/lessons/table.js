@@ -176,7 +176,7 @@ export default function TableComponent({
           rows
         ) : (
           <Table.Tr>
-            <Table.Th ta="center" colSpan={5}>
+            <Table.Th ta="center" colSpan={10}>
               No data found
             </Table.Th>
           </Table.Tr>

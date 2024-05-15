@@ -101,10 +101,8 @@ function Media({ handleUpdate, close, id }) {
               label: "Url",
               value: "link",
             },
-          ]?.map((item) => ({
-            ...item,
-            disabled: item.value === form.values.media_type,
-          }))}
+          ]}
+          allowDeselect={false}
           {...form.getInputProps("media_type")}
           onChange={(e) => {
             form.getInputProps("media_type").onChange(e);

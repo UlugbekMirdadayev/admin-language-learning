@@ -100,6 +100,11 @@ function Reading({ handleUpdate, close, id }) {
             placeholder={input.label}
             disabled={input.disabled}
             {...form.getInputProps(input.name)}
+            styles={{
+              input: {
+                minHeight: 200,
+              },
+            }}
           />
         ))}
         <Group justify="flex-end" mt="md">

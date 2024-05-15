@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Box, Button, Flex, Group, TextInput } from "@mantine/core";
+import { Box, Button, Flex, Group, Textarea } from "@mantine/core";
+import { toast } from "react-toastify";
 import { useForm } from "@mantine/form";
 import { useUser } from "../../redux/selectors";
 import {
@@ -8,7 +9,6 @@ import {
   postRequest,
   putRequest,
 } from "../../services/api";
-import { toast } from "react-toastify";
 import { PlusIcon, SendIcon, Trash } from "../../components/icon";
 
 function Writing({ handleUpdate, close, id }) {
@@ -62,26 +62,27 @@ function Writing({ handleUpdate, close, id }) {
           setLoading(false);
           toast.error(JSON.stringify(err));
         });
-    }
-    postRequest(
-      `/questions`,
-      {
-        question: {
-          text_question_set_id: textQuestionId,
-          text: text,
+    } else {
+      postRequest(
+        `/questions`,
+        {
+          question: {
+            text_question_set_id: textQuestionId,
+            text: text,
+          },
         },
-      },
-      user?.token
-    )
-      .then(() => {
-        setLoading(false);
-        toast.success("Successfully created");
-        handleUpdate(true);
-      })
-      .catch((err) => {
-        setLoading(false);
-        toast.error(JSON.stringify(err));
-      });
+        user?.token
+      )
+        .then(() => {
+          setLoading(false);
+          toast.success("Successfully created");
+          handleUpdate(true);
+        })
+        .catch((err) => {
+          setLoading(false);
+          toast.error(JSON.stringify(err));
+        });
+    }
   };
 
   const handleDelete = (input_id, index) => {
@@ -139,16 +140,28 @@ function Writing({ handleUpdate, close, id }) {
     <Box mx="auto">
       <form onSubmit={form.onSubmit(onSubmit)}>
         {questions.map((input, index) => (
-          <TextInput
+          <Textarea
             key={index}
             mt={"md"}
             required
             withAsterisk
-            label={"Question"}
+            styles={{
+              input: {
+                minHeight: 140,
+                resize: "vertical",
+              },
+            }}
+            label={`${index + 1}) Question`}
             placeholder={"Question"}
             rightSectionWidth={120}
+            rightSectionProps={{
+              style: {
+                alignItems: "flex-end",
+                margin: 10,
+              },
+            }}
             rightSection={
-              <Flex>
+              <Flex align={"flex-end"}>
                 <Button
                   loading={isLoading === input?.id}
                   w={60}

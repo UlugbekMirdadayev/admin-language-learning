@@ -17,6 +17,7 @@ const inputs = [
     name: "description",
     label: "Objectivs",
     as: Textarea,
+    minHeight: 200,
   },
   {
     name: "index",
@@ -76,7 +77,15 @@ function FormCreate({ handleUpdate, close, defaultValues }) {
             placeholder={input.label}
             disabled={input.disabled}
           >
-            <input.as required {...form.getInputProps(input.name)} />
+            <input.as
+              required
+              {...form.getInputProps(input.name)}
+              styles={{
+                input: {
+                  minHeight: input.minHeight,
+                },
+              }}
+            />
           </Input.Wrapper>
         ))}
         <Group justify="flex-end" mt="md">

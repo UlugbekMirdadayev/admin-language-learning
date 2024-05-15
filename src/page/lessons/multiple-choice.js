@@ -7,6 +7,7 @@ import {
   Group,
   Text,
   TextInput,
+  Textarea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useUser } from "../../redux/selectors";
@@ -41,8 +42,10 @@ const FormCard = ({
   forms,
   close,
   choiceId,
+  index,
 }) => {
   const correct = forms?.answers
+    ?.sort((a, b) => a?.id - b?.id)
     ?.map((answ, index) => {
       return answ?.correct ? { ...answ, index } : false;
     })
@@ -53,11 +56,15 @@ const FormCard = ({
   const form = useForm({
     initialValues: {
       question: forms?.content || "",
-      a: forms?.answers[0]?.content || "",
-      b: forms?.answers[1]?.content || "",
-      c: forms?.answers[2]?.content || "",
-      d: forms?.answers[3]?.content || "",
+      a: forms?.answers?.sort((a, b) => a?.id - b?.id)[0]?.content || "",
+      b: forms?.answers?.sort((a, b) => a?.id - b?.id)[1]?.content || "",
+      c: forms?.answers?.sort((a, b) => a?.id - b?.id)[2]?.content || "",
+      d: forms?.answers?.sort((a, b) => a?.id - b?.id)[3]?.content || "",
       current: inputs[correct?.index]?.name,
+      a_id: forms?.answers?.sort((a, b) => a?.id - b?.id)[0]?.id || "",
+      b_id: forms?.answers?.sort((a, b) => a?.id - b?.id)[1]?.id || "",
+      c_id: forms?.answers?.sort((a, b) => a?.id - b?.id)[2]?.id || "",
+      d_id: forms?.answers?.sort((a, b) => a?.id - b?.id)[3]?.id || "",
     },
   });
 
@@ -65,10 +72,10 @@ const FormCard = ({
     const multiple_question = {
       content: values.question,
       answers_attributes: [
-        { content: values.a, correct: values.current === "a" },
-        { content: values.b, correct: values.current === "b" },
-        { content: values.c, correct: values.current === "c" },
-        { content: values.d, correct: values.current === "d" },
+        { content: values.a, correct: values.current === "a", id: values.a_id },
+        { content: values.b, correct: values.current === "b", id: values.b_id },
+        { content: values.c, correct: values.current === "c", id: values.c_id },
+        { content: values.d, correct: values.current === "d", id: values.d_id },
       ],
     };
     setLoading(true);
@@ -83,7 +90,7 @@ const FormCard = ({
         console.log(data, "data");
         toast.success("Updated");
         form.reset();
-        close()
+        close();
       })
       .catch((err) => {
         setLoading(false);
@@ -115,7 +122,9 @@ const FormCard = ({
       <details>
         <summary>
           <Flex align={"center"} justify={"space-between"} mt={"md"}>
-            <p>{forms?.content}</p>
+            <p>
+              {index + 1}) {forms?.content}
+            </p>
             <Flex gap={"sm"}>
               <Button
                 onClick={handleDelete}
@@ -144,43 +153,51 @@ const FormCard = ({
             </Flex>
           </Flex>
         </summary>
-        <TextInput
+        <Textarea
           flex={1}
           label={"Question"}
           required
           withAsterisk
           placeholder={"Question"}
-          rightSectionWidth={120}
+          styles={{
+            input: {
+              minHeight: 80,
+              resize: "vertical",
+            },
+          }}
           {...form.getInputProps("question")}
         />
-        {forms?.answers?.map((inp, index) => (
-          <Flex align={"center"} justify={"space-between"} key={inp.content}>
-            <Checkbox
-              type="radio"
-              mt="md"
-              w={55}
-              h={35}
-              labelPosition="left"
-              label={`${inputs[index]?.name})`}
-              value={inputs[index]?.name}
-              onChange={({ target: { checked } }) => {
-                checked &&
-                  form.setValues({
-                    current: inputs[index]?.name,
-                  });
-              }}
-              checked={form.values.current === inputs[index]?.name}
-            />
-            <TextInput
-              flex={1}
-              required
-              withAsterisk
-              placeholder={"Answer"}
-              rightSectionWidth={120}
-              defaultValue={inp.content}
-            />
-          </Flex>
-        ))}
+        {forms?.answers
+          ?.sort((a, b) => a?.id - b?.id)
+          ?.map((inp, index) => (
+            <Flex align={"center"} justify={"space-between"} key={inp.content}>
+              <Checkbox
+                type="radio"
+                mt="md"
+                w={55}
+                h={35}
+                labelPosition="left"
+                label={`${inputs[index]?.name})`}
+                value={inputs[index]?.name}
+                onChange={({ target: { checked } }) => {
+                  checked &&
+                    form.setValues({
+                      current: inputs[index]?.name,
+                    });
+                }}
+                checked={form.values.current === inputs[index]?.name}
+              />
+              <TextInput
+                flex={1}
+                required
+                withAsterisk
+                placeholder={"Answer"}
+                rightSectionWidth={120}
+                defaultValue={inp.content}
+                {...form.getInputProps(inputs[index]?.name)}
+              />
+            </Flex>
+          ))}
         <Group justify="flex-end" mt="md">
           <Button type="submit" loading={loading}>
             Update
@@ -235,6 +252,7 @@ function MultipleChoice({ handleUpdate, close, id }) {
       .catch((err) => {
         setLoading(false);
         console.log(err, "err");
+        toast.error(err?.message);
       });
   };
 
@@ -256,13 +274,18 @@ function MultipleChoice({ handleUpdate, close, id }) {
   return (
     <Box mx="auto">
       <form onSubmit={form.onSubmit(onSubmit)}>
-        <TextInput
+        <Textarea
           flex={1}
           label={"Question"}
           required
           withAsterisk
           placeholder={"Question"}
-          rightSectionWidth={120}
+          styles={{
+            input: {
+              minHeight: 80,
+              resize: "vertical",
+            },
+          }}
           {...form.getInputProps("question")}
         />
         {inputs?.map((inp) => (
@@ -300,7 +323,7 @@ function MultipleChoice({ handleUpdate, close, id }) {
           </Button>
         </Group>
       </form>
-      {listArray?.map((forms) => (
+      {listArray?.map((forms, index) => (
         <FormCard
           key={forms?.id}
           forms={forms}
@@ -309,6 +332,7 @@ function MultipleChoice({ handleUpdate, close, id }) {
           handleUpdate={handleUpdate}
           choiceId={forms?.id}
           close={close}
+          index={index}
         />
       ))}
     </Box>

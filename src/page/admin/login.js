@@ -39,7 +39,7 @@ const Login = () => {
         }
       })
       .catch((err) => {
-        toast.error(JSON.stringify(err?.response?.data?.error));
+        toast.error(JSON.stringify(err?.response?.data?.error || err?.response?.data || err?.response || err?.message));
       })
       .finally(() => {
         dispatch(setLoader(false));
