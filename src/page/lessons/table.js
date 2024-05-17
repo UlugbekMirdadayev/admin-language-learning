@@ -15,137 +15,139 @@ export default function TableComponent({
   handleGetLessons,
   setLoader,
 }) {
-  const rows = data?.map((element) => (
-    <Table.Tr key={element?.id}>
-      <Table.Td>{element?.id}</Table.Td>
-      <Table.Td>{element?.index}</Table.Td>
-      <Table.Td>
-        <Text lineClamp={1}>{element?.title}</Text>
-      </Table.Td>
-      <Table.Td>
-        <Text lineClamp={1}>{element?.description}</Text>
-      </Table.Td>
-      <Table.Td>
-        <Flex gap={"sm"}>
-          <Menu
-            shadow="md"
-            width={150}
-            transitionProps={{ transition: "pop", duration: 150 }}
-            position="left-start"
-          >
-            <Menu.Target>
-              <Button color={"red"}>
-                <Trash fill={"#fff"} />
-              </Button>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Label>
-                Are you sure you want to delete this lesson?
-              </Menu.Label>
-              <Menu.Divider />
-              <Flex>
-                <Menu.Item
-                  onClick={() => handleDelete(element?.id)}
-                  color="red"
-                >
-                  Yes
-                </Menu.Item>
-                <Menu.Item>No</Menu.Item>
-              </Flex>
-            </Menu.Dropdown>
-          </Menu>
+  const rows = [...data]
+    ?.sort((a, b) => a?.index - b?.index)
+    ?.map((element) => (
+      <Table.Tr key={element?.id}>
+        <Table.Td>{element?.id}</Table.Td>
+        <Table.Td>{element?.index}</Table.Td>
+        <Table.Td>
+          <Text lineClamp={1}>{element?.title}</Text>
+        </Table.Td>
+        <Table.Td>
+          <Text lineClamp={1}>{element?.description}</Text>
+        </Table.Td>
+        <Table.Td>
+          <Flex gap={"sm"}>
+            <Menu
+              shadow="md"
+              width={150}
+              transitionProps={{ transition: "pop", duration: 150 }}
+              position="left-start"
+            >
+              <Menu.Target>
+                <Button color={"red"}>
+                  <Trash fill={"#fff"} />
+                </Button>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Label>
+                  Are you sure you want to delete this lesson?
+                </Menu.Label>
+                <Menu.Divider />
+                <Flex>
+                  <Menu.Item
+                    onClick={() => handleDelete(element?.id)}
+                    color="red"
+                  >
+                    Yes
+                  </Menu.Item>
+                  <Menu.Item>No</Menu.Item>
+                </Flex>
+              </Menu.Dropdown>
+            </Menu>
 
+            <ModalScreen
+              title={"Edit lesson"}
+              btn_title={<PenIcon fill={"#fff"} />}
+              body={({ close }) => (
+                <FormCreate
+                  handleUpdate={handleGetLessons}
+                  setLoader={(boolean) => setLoader(boolean)}
+                  close={close}
+                  defaultValues={element}
+                />
+              )}
+            />
+          </Flex>
+        </Table.Td>
+        <Table.Td>
           <ModalScreen
-            title={"Edit lesson"}
+            title={"Reading lesson"}
             btn_title={<PenIcon fill={"#fff"} />}
             body={({ close }) => (
-              <FormCreate
+              <Reading
                 handleUpdate={handleGetLessons}
                 setLoader={(boolean) => setLoader(boolean)}
                 close={close}
                 defaultValues={element}
+                id={element?.id}
               />
             )}
           />
-        </Flex>
-      </Table.Td>
-      <Table.Td>
-        <ModalScreen
-          title={"Reading lesson"}
-          btn_title={<PenIcon fill={"#fff"} />}
-          body={({ close }) => (
-            <Reading
-              handleUpdate={handleGetLessons}
-              setLoader={(boolean) => setLoader(boolean)}
-              close={close}
-              defaultValues={element}
-              id={element?.id}
-            />
-          )}
-        />
-      </Table.Td>
-      <Table.Td>
-        <ModalScreen
-          title={"Media lesson"}
-          btn_title={<PenIcon fill={"#fff"} />}
-          body={({ close }) => (
-            <Media
-              handleUpdate={handleGetLessons}
-              setLoader={(boolean) => setLoader(boolean)}
-              close={close}
-              id={element?.id}
-            />
-          )}
-        />
-      </Table.Td>
-      <Table.Td>
-        <ModalScreen
-          disabledBtn={!element?.media_items?.id}
-          popupBtn={'Media Item Not Found'}
-          title={"Translation"}
-          btn_title={<PenIcon fill={"#fff"} />}
-          body={({ close }) => (
-            <Translation
-              handleUpdate={handleGetLessons}
-              setLoader={(boolean) => setLoader(boolean)}
-              close={close}
-              id={element?.id}
-            />
-          )}
-        />
-      </Table.Td>
-      <Table.Td>
-        <ModalScreen
-          title={"Writing"}
-          btn_title={<PenIcon fill={"#fff"} />}
-          body={({ close }) => (
-            <Writing
-              handleUpdate={handleGetLessons}
-              setLoader={(boolean) => setLoader(boolean)}
-              close={close}
-              id={element?.id}
-            />
-          )}
-        />
-      </Table.Td>
-      <Table.Td>
-        <ModalScreen
-          disabledBtn={!element?.media_items?.id}
-          popupBtn={'Media Item Not Found'}
-          title={"Multiple Choice"}
-          btn_title={<PenIcon fill={"#fff"} />}
-          body={({ close }) => (
-            <MultipleChoice
-              handleUpdate={handleGetLessons}
-              setLoader={(boolean) => setLoader(boolean)}
-              close={close}
-              id={element?.id}
-            />
-          )}
-        />
-      </Table.Td>
-    </Table.Tr>
-  ));
+        </Table.Td>
+        <Table.Td>
+          <ModalScreen
+            title={"Media lesson"}
+            btn_title={<PenIcon fill={"#fff"} />}
+            body={({ close }) => (
+              <Media
+                handleUpdate={handleGetLessons}
+                setLoader={(boolean) => setLoader(boolean)}
+                close={close}
+                id={element?.id}
+              />
+            )}
+          />
+        </Table.Td>
+        <Table.Td>
+          <ModalScreen
+            disabledBtn={!element?.media_items?.id}
+            popupBtn={"Media Item Not Found"}
+            title={"Translation"}
+            btn_title={<PenIcon fill={"#fff"} />}
+            body={({ close }) => (
+              <Translation
+                handleUpdate={handleGetLessons}
+                setLoader={(boolean) => setLoader(boolean)}
+                close={close}
+                id={element?.id}
+              />
+            )}
+          />
+        </Table.Td>
+        <Table.Td>
+          <ModalScreen
+            title={"Writing"}
+            btn_title={<PenIcon fill={"#fff"} />}
+            body={({ close }) => (
+              <Writing
+                handleUpdate={handleGetLessons}
+                setLoader={(boolean) => setLoader(boolean)}
+                close={close}
+                id={element?.id}
+              />
+            )}
+          />
+        </Table.Td>
+        <Table.Td>
+          <ModalScreen
+            disabledBtn={!element?.media_items?.id}
+            popupBtn={"Media Item Not Found"}
+            title={"Multiple Choice"}
+            btn_title={<PenIcon fill={"#fff"} />}
+            body={({ close }) => (
+              <MultipleChoice
+                handleUpdate={handleGetLessons}
+                setLoader={(boolean) => setLoader(boolean)}
+                close={close}
+                id={element?.id}
+              />
+            )}
+          />
+        </Table.Td>
+      </Table.Tr>
+    ));
 
   return (
     <Table
