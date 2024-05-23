@@ -69,6 +69,17 @@ export default function TableComponent({ data, user, getReport, lessons }) {
 
   const handleReset = (user_id, lesson_id) => {
     console.log({ user_id, lesson_id });
+    postRequest(`/lessons/${lesson_id}/reset_score`, { user_id }, user?.token)
+      .then(({ data }) => {
+        console.log("=====================data===============");
+        console.log(data);
+        console.log("===================data=================");
+      })
+      .catch((err) => {
+        console.log("====================================");
+        console.log(err, "err");
+        console.log("====================================");
+      });
   };
 
   const handleRoleChange = (method, setValue) => {
