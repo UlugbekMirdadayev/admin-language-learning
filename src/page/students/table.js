@@ -13,7 +13,12 @@ import {
 } from "@mantine/core";
 import { PenIcon, Reload, Trash } from "../../components/icon";
 import { useForm } from "@mantine/form";
-import { deleteRequest, getRequest, putRequest } from "../../services/api";
+import {
+  deleteRequest,
+  getRequest,
+  postRequest,
+  putRequest,
+} from "../../services/api";
 import { toast } from "react-toastify";
 
 export default function TableComponent({ data, user, getReport, lessons }) {
@@ -46,15 +51,14 @@ export default function TableComponent({ data, user, getReport, lessons }) {
 
   const onSubmit = (values) => {
     const formData = values;
-    console.log(values);
     delete formData.id;
+    delete formData.teacher;
     setLoading(true);
     putRequest(`/users/${id}`, { user: formData }, user?.token)
       .then(() => {
         setLoading(false);
         getReport(true);
         setOpen(false);
-        getReport(true);
         toast.success("Updated");
       })
       .catch((err) => {
@@ -65,6 +69,39 @@ export default function TableComponent({ data, user, getReport, lessons }) {
 
   const handleReset = (user_id, lesson_id) => {
     console.log({ user_id, lesson_id });
+  };
+
+  const handleRoleChange = (method, setValue) => {
+    if (method === "true") {
+      setLoading(true);
+      postRequest(`/users/${id}/add_teacher_role`, {}, user?.token)
+        .then(({ data }) => {
+          setLoading(false);
+          setValue();
+          toast.success(data?.message || "Success");
+          getReport(true);
+        })
+        .catch((err) => {
+          setLoading(false);
+          toast.error(JSON.stringify(err?.message || err?.response));
+          console.log(err, "err");
+        });
+    }
+    if (method === "false") {
+      setLoading(true);
+      deleteRequest(`/users/${id}/remove_teacher_role`, user?.token)
+        .then(({ data }) => {
+          setLoading(false);
+          setValue();
+          toast.info(data?.message || "Success");
+          getReport(true);
+        })
+        .catch((err) => {
+          setLoading(false);
+          toast.error(JSON.stringify(err?.message || err?.response));
+          console.log(err, "err");
+        });
+    }
   };
 
   const Rows = function () {
@@ -99,7 +136,7 @@ export default function TableComponent({ data, user, getReport, lessons }) {
         <React.Fragment key={element?.id}>
           <Modal
             size="lg"
-            title={`Lesson score - ${lesson?.label}`}
+            title={`Lesson score\n${lesson?.label}`}
             opened={!!lesson?.value}
             onClose={() => setLesson()}
           >
@@ -159,7 +196,10 @@ export default function TableComponent({ data, user, getReport, lessons }) {
                           <Flex>
                             <Menu.Item
                               onClick={() =>
-                                handleReset(element?.id, isLesson?.id)
+                                handleReset(
+                                  element?.id,
+                                  isLesson?.user_lesson?.lesson_id
+                                )
                               }
                             >
                               Yes
@@ -192,7 +232,7 @@ export default function TableComponent({ data, user, getReport, lessons }) {
                 label="Select to view"
                 placeholder="Select lesson"
                 data={lessons?.map((lesson) => ({
-                  label: lesson?.title,
+                  label: `${lesson?.index}) ${lesson?.title}`,
                   value: String(lesson?.id),
                 }))}
                 searchable
@@ -218,6 +258,7 @@ export default function TableComponent({ data, user, getReport, lessons }) {
                       name: element?.name || "",
                       surname: element?.surname || "",
                       email: element?.email || "",
+                      teacher: String(Boolean(element?.teacher)) || "",
                     });
                     setID(element?.id);
                     setOpen(true);
@@ -266,6 +307,27 @@ export default function TableComponent({ data, user, getReport, lessons }) {
           <Input.Wrapper label="E-mail">
             <Input {...form.getInputProps("email")} />
           </Input.Wrapper>
+          <Select
+            label="Role"
+            data={[
+              {
+                label: "Teacher",
+                value: "true",
+              },
+              {
+                label: "Student",
+                value: "false",
+              },
+            ]}
+            {...form.getInputProps("teacher")}
+            onChange={(event) => {
+              handleRoleChange(event, () =>
+                form.getInputProps("teacher").onChange(event)
+              );
+            }}
+            allowDeselect={false}
+            rightSection={loading ? <Loader size={"xs"} color="gray" /> : null}
+          />
           <Group justify="flex-end" mt={"sm"}>
             <Button type="submit" loading={loading}>
               Update

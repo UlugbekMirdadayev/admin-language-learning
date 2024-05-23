@@ -24,7 +24,7 @@ const Students = () => {
       getRequest("/users", user?.token)
         .then(({ data }) => {
           dispatch(setLoader(false));
-          dispatch(setReport(data?.filter((users) => users?.id !== user?.id)));
+          dispatch(setReport(data?.filter((users) => users?.id !== user?.id)?.sort((a, b) => a?.teacher - b?.teacher)));
         })
         .catch((err) => {
           dispatch(setLoader(false));
@@ -41,7 +41,7 @@ const Students = () => {
       getRequest("/lessons", user?.token)
         .then(({ data }) => {
           dispatch(setLoader(false));
-          dispatch(setLessons(data));
+          dispatch(setLessons(data?.sort((a, b) => a?.index - b?.index)));
         })
         .catch((err) => {
           dispatch(setLoader(false));
