@@ -67,18 +67,18 @@ export default function TableComponent({ data, user, getReport, lessons }) {
       });
   };
 
-  const handleReset = (user_id, lesson_id) => {
-    console.log({ user_id, lesson_id });
+  const handleReset = (user_id, lesson_id, setLesson, setLoading, element) => {
+    setLoading(element?.id);
     postRequest(`/lessons/${lesson_id}/reset_score`, { user_id }, user?.token)
       .then(({ data }) => {
-        console.log("=====================data===============");
-        console.log(data);
-        console.log("===================data=================");
+        setLoading(false);
+        toast.info(data?.message);
+        setLesson();
       })
       .catch((err) => {
-        console.log("====================================");
         console.log(err, "err");
-        console.log("====================================");
+        toast.info(JSON.stringify(err?.response?.data || "Error"));
+        setLoading(false);
       });
   };
 
@@ -198,7 +198,11 @@ export default function TableComponent({ data, user, getReport, lessons }) {
                       <Menu>
                         <Menu.Target>
                           <Button size="xs">
-                            <Reload fill="#fff" />
+                            {loading === element?.id ? (
+                              <Loader size={"xs"} color="#fff" />
+                            ) : (
+                              <Reload fill="#fff" />
+                            )}
                           </Button>
                         </Menu.Target>
 
@@ -209,7 +213,10 @@ export default function TableComponent({ data, user, getReport, lessons }) {
                               onClick={() =>
                                 handleReset(
                                   element?.id,
-                                  isLesson?.user_lesson?.lesson_id
+                                  isLesson?.user_lesson?.lesson_id,
+                                  setLesson,
+                                  setLoading,
+                                  element
                                 )
                               }
                             >
