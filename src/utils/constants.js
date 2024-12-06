@@ -1,7 +1,7 @@
 import { rem } from "@mantine/core";
 
-export const BASE_URL = "https://langapp-production.up.railway.app/api/v1";
-export const IMAGE_URL = "https://langapp-production.up.railway.app/";
+export const BASE_URL = "https://api.training.center.dadabayev.uz/api";
+export const IMAGE_URL = "https://api.training.center.dadabayev.uz/";
 
 export const themes = {
   fontSizes: {

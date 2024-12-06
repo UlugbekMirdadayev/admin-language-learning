@@ -1,93 +1,102 @@
-import { useState, useEffect } from "react";
+import {
+  // useState,
+  useEffect,
+} from "react";
 import {
   Box,
   Button,
   Group,
-  FileInput,
-  Select,
+  // FileInput,
+  // Select,
   Input,
-  Image,
+  // Image,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 // import { postRequest } from "../../services/api";
 // import { toast } from "react-toastify";
-import { useUser } from "../../redux/selectors";
-import { getRequest, postRequest, putRequest } from "../../services/api";
-import { toast } from "react-toastify";
-import { IMAGE_URL } from "../../utils/constants";
+// import { useUser } from "../../redux/selectors";
+// import { getRequest, postRequest, putRequest } from "../../services/api";
+// import { toast } from "react-toastify";
+// import { IMAGE_URL } from "../../utils/constants";ƒ
 
-function Media({ handleUpdate, close, id }) {
-  const [loading, setLoading] = useState(false);
-  const [update, setUpdate] = useState(false);
-  const user = useUser();
+function Media({ handleUpdate, close, id, defaultValues }) {
+  // const [loading, setLoading] = useState(false);
+  // const [update, setUpdate] = useState(false);
+  // const user = useUser();
   const form = useForm({
     initialValues: {
-      media_type: "image",
-      media_link: "",
+      media: "",
+      // media_link: "",
     },
   });
 
   const onSubmit = (values) => {
-    if (!values?.media_link) {
-      return form.setErrors({ media_link: true });
-    }
-    const formData = new FormData();
+    close();
+    // if (!values?.media_link) {
+    //   return form.setErrors({ media_link: true });
+    // }
+    // const formData = new FormData();
 
-    formData.append("media_item[media_type]", values?.media_type);
-    formData.append("media_item[media_link]", values?.media_link);
+    // formData.append("media_item[media_type]", values?.media_type);
+    // formData.append("media_item[media_link]", values?.media_link);
 
-    setLoading(true);
+    // setLoading(true);
 
-    if (update?.id) {
-      return putRequest(
-        `/lessons/${id}/media_items/${update?.id}`,
-        formData,
-        user?.token
-      )
-        .then(() => {
-          setLoading(false);
-          toast.success("Successfully updated");
-          handleUpdate(true);
-          close();
-        })
-        .catch((err) => {
-          setLoading(false);
-          toast.success(JSON.stringify(err));
-        });
-    }
+    // if (update?.id) {
+    //   return putRequest(
+    //     `/lessons/${id}/media_items/${update?.id}`,
+    //     formData,
+    //     user?.token
+    //   )
+    //     .then(() => {
+    //       setLoading(false);
+    //       toast.success("Successfully updated");
+    //       handleUpdate(true);
+    //       close();
+    //     })
+    //     .catch((err) => {
+    //       setLoading(false);
+    //       toast.success(JSON.stringify(err));
+    //     });
+    // }
 
-    postRequest(`/lessons/${id}/media_items`, formData, user?.token)
-      .then(({ data }) => {
-        console.log({ data });
-        setLoading(false);
-        toast.success("Successfully created");
-        handleUpdate(true);
-        close();
-      })
-      .catch((err) => {
-        setLoading(false);
-        toast.success(JSON.stringify(err));
-      });
+    // postRequest(`/lessons/${id}/media_items`, formData, user?.token)
+    //   .then(({ data }) => {
+    //     console.log({ data });
+    //     setLoading(false);
+    //     toast.success("Successfully created");
+    //     handleUpdate(true);
+    //     close();
+    //   })
+    //   .catch((err) => {
+    //     setLoading(false);
+    //     toast.success(JSON.stringify(err));
+    //   });
   };
 
   useEffect(() => {
-    setLoading(true);
-    getRequest("/lessons/" + id, user?.token)
-      .then(({ data }) => {
-        setLoading(false);
-        setUpdate(data?.media_items?.id ? data?.media_items : false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        console.log(error, "error");
+    if (defaultValues?.media) {
+      form.setValues({
+        media: defaultValues?.media,
       });
+    }
+    // setLoading(true);
+    // getRequest("/lessons/" + id, user?.token)
+    //   .then(({ data }) => {
+    //     setLoading(false);
+    //     setUpdate(data?.media_items?.id ? data?.media_items : false);
+    //   })
+    //   .catch((error) => {
+    //     setLoading(false);
+    //     console.log(error, "error");
+    //   });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, user?.token]);
+  }, []);
 
   return (
     <Box mx="auto">
       <form onSubmit={form.onSubmit(onSubmit)}>
-        <Select
+        {/* <Select
           mt={"md"}
           required
           label={"Media Type"}
@@ -113,8 +122,8 @@ function Media({ handleUpdate, close, id }) {
               media_link: true,
             });
           }}
-        />
-        {form.values.media_link ? null : update?.media_link ? (
+        /> */}
+        {/* {form.values.media_link ? null : update?.media_link ? (
           update?.media_type === "image" ? (
             <Image
               src={IMAGE_URL + update?.media_link}
@@ -137,27 +146,30 @@ function Media({ handleUpdate, close, id }) {
               allowFullScreen
             ></iframe>
           )
-        ) : null}
-        {form.values.media_type === "link" ? (
-          <Input.Wrapper label={"Media Link"} mt={"md"} required>
-            <Input
-              required
-              placeholder={"Media Link"}
-              {...form.getInputProps("media_link")}
-            />
-          </Input.Wrapper>
-        ) : (
-          <FileInput
-            mt={"md"}
+        ) : null} */}
+        {/* {form.values.media_type === "link" ? ( */}
+        <Input.Wrapper label={"Media Link"} mt={"md"} required>
+          <Input
             required
-            label={"Media"}
-            placeholder={"Media"}
-            accept="image/*"
-            {...form.getInputProps("media_link")}
+            placeholder={"Media Link"}
+            {...form.getInputProps("media")}
           />
-        )}
+        </Input.Wrapper>
+        {/* // ) : (
+        //   <FileInput
+        //     mt={"md"}
+        //     required
+        //     label={"Media"}
+        //     placeholder={"Media"}
+        //     accept="image/*"
+        //     {...form.getInputProps("media_link")}
+        //   />
+        // )} */}
         <Group justify="flex-end" mt="md">
-          <Button type="submit" loading={loading}>
+          <Button
+            type="submit"
+            // loading={loading}
+          >
             Yuborish
           </Button>
         </Group>

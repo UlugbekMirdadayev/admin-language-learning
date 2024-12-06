@@ -22,10 +22,12 @@ const Lessons = () => {
     (update) => {
       if (!update && lessons?.length) return;
       dispatch(setLoader(true));
-      getRequest("/lessons", user?.token)
+      getRequest("/lesson/all", user?.token)
         .then(({ data }) => {
           dispatch(setLoader(false));
-          dispatch(setLessons(data));
+          dispatch(
+            setLessons(data?.result?.sort((a, b) => a?.index - b?.index))
+          );
         })
         .catch((err) => {
           dispatch(setLoader(false));

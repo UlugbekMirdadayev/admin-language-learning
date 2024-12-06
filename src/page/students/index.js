@@ -24,7 +24,13 @@ const Students = () => {
       getRequest("/users", user?.token)
         .then(({ data }) => {
           dispatch(setLoader(false));
-          dispatch(setReport(data?.filter((users) => users?.id !== user?.id)?.sort((a, b) => a?.teacher - b?.teacher)));
+          dispatch(
+            setReport(
+              data
+                ?.filter((users) => users?.id !== user?.id)
+                ?.sort((a, b) => a?.teacher - b?.teacher)
+            )
+          );
         })
         .catch((err) => {
           dispatch(setLoader(false));
@@ -38,10 +44,12 @@ const Students = () => {
     (update) => {
       if (!update && lessons?.length) return;
       dispatch(setLoader(true));
-      getRequest("/lessons", user?.token)
+      getRequest("/lesson/all", user?.token)
         .then(({ data }) => {
           dispatch(setLoader(false));
-          dispatch(setLessons(data?.sort((a, b) => a?.index - b?.index)));
+          dispatch(
+            setLessons(data?.result?.sort((a, b) => a?.index - b?.index))
+          );
         })
         .catch((err) => {
           dispatch(setLoader(false));

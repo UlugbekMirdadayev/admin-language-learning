@@ -2,35 +2,34 @@ import { useState, useEffect } from "react";
 import { Box, Button, Flex, Group, Textarea } from "@mantine/core";
 import { toast } from "react-toastify";
 import { useForm } from "@mantine/form";
-import { useUser } from "../../redux/selectors";
-import {
-  deleteRequest,
-  getRequest,
-  postRequest,
-  putRequest,
-} from "../../services/api";
+// import { useUser } from "../../redux/selectors";
+import // deleteRequest,
+// getRequest,
+// postRequest,
+// putRequest,
+"../../services/api";
 import { PlusIcon, SendIcon, Trash } from "../../components/icon";
 
-function Writing({ handleUpdate, close, id }) {
-  const [loading, setLoading] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [textQuestionId, setTextQuestionId] = useState(null);
+function Writing({ handleUpdate, close, id, defaultValues }) {
+  // const [loading, setLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [textQuestionId, setTextQuestionId] = useState(null);
   const [questions, setQuestions] = useState([
-    { text: "" },
-    { text: "" },
-    { text: "" },
-    { text: "" },
-    { text: "" },
+    { questions: "" },
+    { questions: "" },
+    { questions: "" },
+    { questions: "" },
+    { questions: "" },
   ]);
 
-  const user = useUser();
+  // const user = useUser();
   const form = useForm({
     initialValues: {
+      text0: "",
       text1: "",
       text2: "",
       text3: "",
       text4: "",
-      text5: "",
     },
   });
 
@@ -40,101 +39,120 @@ function Writing({ handleUpdate, close, id }) {
 
   const sendCheck = (text, input_id) => {
     if (!text) return;
+    toast.success("Successfully created");
 
-    setLoading(true);
-    if (input_id) {
-      return putRequest(
-        `/questions/${input_id}`,
-        {
-          question: {
-            text_question_set_id: textQuestionId,
-            text: text,
-          },
-        },
-        user?.token
-      )
-        .then(() => {
-          setLoading(false);
-          toast.success("Successfully updated");
-          handleUpdate(true);
-        })
-        .catch((err) => {
-          setLoading(false);
-          toast.error(JSON.stringify(err));
-        });
-    } else {
-      postRequest(
-        `/questions`,
-        {
-          question: {
-            text_question_set_id: textQuestionId,
-            text: text,
-          },
-        },
-        user?.token
-      )
-        .then(() => {
-          setLoading(false);
-          toast.success("Successfully created");
-          handleUpdate(true);
-        })
-        .catch((err) => {
-          setLoading(false);
-          toast.error(JSON.stringify(err));
-        });
-    }
+    // setLoading(true);
+    // if (input_id) {
+    //   return putRequest(
+    //     `/questions/${input_id}`,
+    //     {
+    //       question: {
+    //         text_question_set_id: textQuestionId,
+    //         text: text,
+    //       },
+    //     },
+    //     user?.token
+    //   )
+    //     .then(() => {
+    //       setLoading(false);
+    //       toast.success("Successfully updated");
+    //       handleUpdate(true);
+    //     })
+    //     .catch((err) => {
+    //       setLoading(false);
+    //       toast.error(JSON.stringify(err));
+    //     });
+    // } else {
+    //   postRequest(
+    //     `/questions`,
+    //     {
+    //       question: {
+    //         text_question_set_id: textQuestionId,
+    //         text: text,
+    //       },
+    //     },
+    //     user?.token
+    //   )
+    //     .then(() => {
+    //       setLoading(false);
+    //       toast.success("Successfully created");
+    //       handleUpdate(true);
+    //     })
+    //     .catch((err) => {
+    //       setLoading(false);
+    //       toast.error(JSON.stringify(err));
+    //     });
+    // }
   };
 
   const handleDelete = (input_id, index) => {
     if (!input_id && (index === 0 ? true : index))
       return setQuestions(questions.filter((_, _index) => _index !== index));
 
-    setIsLoading(input_id);
-    deleteRequest(`/questions/${input_id}`, user?.token)
-      .then(() => {
-        setIsLoading(false);
-        toast.success("Successfully deleted");
-        handleUpdate(true);
-        setQuestions(questions.filter((item) => item?.id !== input_id));
-        form.setValues({
-          [`text${index}`]: "",
-        });
-      })
-      .catch((err) => {
-        setIsLoading(false);
-        toast.error(JSON.stringify(err));
-      });
+    toast.success("Successfully deleted");
+
+    // setIsLoading(input_id);
+    // deleteRequest(`/questions/${input_id}`, user?.token)
+    //   .then(() => {
+    //     setIsLoading(false);
+    //     toast.success("Successfully deleted");
+    //     handleUpdate(true);
+    //     setQuestions(questions.filter((item) => item?.id !== input_id));
+    //     form.setValues({
+    //       [`text${index}`]: "",
+    //     });
+    //   })
+    //   .catch((err) => {
+    //     setIsLoading(false);
+    //     toast.error(JSON.stringify(err));
+    //   });
   };
 
   useEffect(() => {
-    setLoading(true);
-    getRequest(`/lessons/${id}`, user?.token)
-      .then(({ data }) => {
-        setLoading(false);
-        data?.text_question_sets?.questions?.map(({ text }, index) =>
-          form.setValues({
-            [`text${index}`]: text,
-          })
-        );
-        setTextQuestionId(data?.text_question_sets?.id);
-        setQuestions(
-          data?.text_question_sets?.questions?.length
-            ? data?.text_question_sets?.questions
-            : questions
-        );
-        // form.setValues({
-        //   text: data?.text_question_sets?.text,
-        // });
-        // setUpdate(
-        //   data?.text_question_sets?.text ? data?.text_question_sets?.id : false
-        // );
-      })
-      .catch((error) => {
-        setLoading(false);
-        console.log(error, "error");
-      });
+    if (defaultValues) {
+      setQuestions((questions) =>
+        defaultValues?.questions?.length
+          ? defaultValues?.questions?.map(({ question }) => ({
+              question,
+            }))
+          : questions
+      );
+      form.setValues(
+        defaultValues?.questions
+          ?.map(({ question }, index) => ({
+            [`text${index}`]: question,
+          }))
+          .reduce((acc, cur) => ({ ...acc, ...cur }), {})
+      );
+    }
+    // setLoading(true);
+    // getRequest(`/lessons/${id}`, user?.token)
+    //   .then(({ data }) => {
+    //     setLoading(false);
+    //     data?.text_question_sets?.questions?.map(({ text }, index) =>
+    //       form.setValues({
+    //         [`text${index}`]: text,
+    //       })
+    //     );
+    //     setTextQuestionId(data?.text_question_sets?.id);
+    //     setQuestions(
+    //       data?.text_question_sets?.questions?.length
+    //         ? data?.text_question_sets?.questions
+    //         : questions
+    //     );
+    // form.setValues({
+    //   text: data?.text_question_sets?.text,
+    // });
+    // setUpdate(
+    //   data?.text_question_sets?.text ? data?.text_question_sets?.id : false
+    // );
+    // })
+    // .catch((error) => {
+    //   setLoading(false);
+    //   console.log(error, "error");
+    // });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, user?.token]);
+  }, []);
 
   return (
     <Box mx="auto">
@@ -163,7 +181,7 @@ function Writing({ handleUpdate, close, id }) {
             rightSection={
               <Flex align={"flex-end"}>
                 <Button
-                  loading={isLoading === input?.id}
+                  // loading={isLoading === input?.id}
                   w={60}
                   color="red"
                   disabled={questions?.length === 1}
@@ -192,7 +210,11 @@ function Writing({ handleUpdate, close, id }) {
           <PlusIcon fill="#fff" />
         </Button>
         <Group justify="flex-end" mt="md">
-          <Button onClick={close} type="button" loading={loading}>
+          <Button
+            onClick={close}
+            type="button"
+            // loading={loading}
+          >
             Close
           </Button>
         </Group>

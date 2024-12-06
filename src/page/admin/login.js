@@ -9,7 +9,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { post } from "../../services/api";
+import { getRequest, post } from "../../services/api";
 import classes from "./style.module.css";
 import { useDispatch } from "react-redux";
 import { setLoader } from "../../redux/loaderSlice";
@@ -29,17 +29,43 @@ const Login = () => {
 
   const onSubmit = (values) => {
     dispatch(setLoader(true));
-    post("/login", values)
+    post("/auth/login", values)
       .then(({ data }) => {
-        if (data?.user?.teacher) {
-          dispatch(setUser({ ...data?.user, token: data?.token }));
-          navigate("/", { replace: true });
+        if (data?.result?.token) {
+          getRequest("/user/me", data?.result?.token)
+            .then(({ data: { result } }) => {
+              dispatch(setLoader(false));
+              if (result?.role?.id !== 1) {
+                toast.error("You are not authorized to access this page");
+                return;
+              }
+              dispatch(setUser({ ...result, token: data?.result?.token }));
+              navigate("/", { replace: true });
+            })
+            .catch((err) => {
+              dispatch(setLoader(false));
+              toast.error(
+                JSON.stringify(
+                  err?.response?.data?.error ||
+                    err?.response?.data ||
+                    err?.response ||
+                    err?.message
+                )
+              );
+            });
         } else {
-          toast.error("You are not allowed to access this page");
+          dispatch(setLoader(false));
         }
       })
       .catch((err) => {
-        toast.error(JSON.stringify(err?.response?.data?.error || err?.response?.data || err?.response || err?.message));
+        toast.error(
+          JSON.stringify(
+            err?.response?.data?.error ||
+              err?.response?.data ||
+              err?.response ||
+              err?.message
+          )
+        );
       })
       .finally(() => {
         dispatch(setLoader(false));
