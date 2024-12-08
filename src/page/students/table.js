@@ -10,6 +10,7 @@ import {
   Group,
   Select,
   Loader,
+  PasswordInput,
 } from "@mantine/core";
 import { PenIcon, Reload, Trash } from "../../components/icon";
 import { useForm } from "@mantine/form";
@@ -28,7 +29,7 @@ export default function TableComponent({ data, user, getReport, lessons }) {
 
   const handleDelete = (id) => {
     setLoading(true);
-    deleteRequest(`/users/${id}`, user?.token)
+    deleteRequest(`/user/destroy/${id}`, user?.token)
       .then(() => {
         setLoading(false);
         getReport(true);
@@ -43,9 +44,10 @@ export default function TableComponent({ data, user, getReport, lessons }) {
 
   const form = useForm({
     initialValues: {
-      name: "",
-      surname: "",
+      first_name: "",
+      last_name: "",
       email: "",
+      password: "",
     },
   });
 
@@ -53,8 +55,24 @@ export default function TableComponent({ data, user, getReport, lessons }) {
     const formData = values;
     delete formData.id;
     delete formData.teacher;
+    formData.user_id = id;
+    const oldData = data?.find((element) => element?.id === id);
+    if (
+      oldData?.first_name === formData.first_name &&
+      oldData?.last_name === formData.last_name &&
+      oldData?.email === formData.email &&
+      !formData.password
+    ) {
+      setOpen(false);
+      return;
+    }
+
+    // oldData?.first_name === formData.first_name && delete formData.first_name;
+    // oldData?.last_name === formData.last_name && delete formData.last_name;
+    // oldData?.email === formData.email && delete formData.email;
+
     setLoading(true);
-    putRequest(`/users/${id}`, { user: formData }, user?.token)
+    putRequest(`/user/update`, formData, user?.token)
       .then(() => {
         setLoading(false);
         getReport(true);
@@ -63,7 +81,7 @@ export default function TableComponent({ data, user, getReport, lessons }) {
       })
       .catch((err) => {
         setLoading(false);
-        toast.error(JSON.stringify(err));
+        toast.error(JSON.stringify(err?.response?.data?.message));
       });
   };
 
@@ -82,38 +100,38 @@ export default function TableComponent({ data, user, getReport, lessons }) {
       });
   };
 
-  const handleRoleChange = (method, setValue) => {
-    if (method === "true") {
-      setLoading(true);
-      postRequest(`/users/${id}/add_teacher_role`, {}, user?.token)
-        .then(({ data }) => {
-          setLoading(false);
-          setValue();
-          toast.success(data?.message || "Success");
-          getReport(true);
-        })
-        .catch((err) => {
-          setLoading(false);
-          toast.error(JSON.stringify(err?.message || err?.response));
-          console.log(err, "err");
-        });
-    }
-    if (method === "false") {
-      setLoading(true);
-      deleteRequest(`/users/${id}/remove_teacher_role`, user?.token)
-        .then(({ data }) => {
-          setLoading(false);
-          setValue();
-          toast.info(data?.message || "Success");
-          getReport(true);
-        })
-        .catch((err) => {
-          setLoading(false);
-          toast.error(JSON.stringify(err?.message || err?.response));
-          console.log(err, "err");
-        });
-    }
-  };
+  // const handleRoleChange = (method, setValue) => {
+  //   if (method === "true") {
+  //     setLoading(true);
+  //     postRequest(`/users/${id}/add_teacher_role`, {}, user?.token)
+  //       .then(({ data }) => {
+  //         setLoading(false);
+  //         setValue();
+  //         toast.success(data?.message || "Success");
+  //         getReport(true);
+  //       })
+  //       .catch((err) => {
+  //         setLoading(false);
+  //         toast.error(JSON.stringify(err?.message || err?.response));
+  //         console.log(err, "err");
+  //       });
+  //   }
+  //   if (method === "false") {
+  //     setLoading(true);
+  //     deleteRequest(`/users/${id}/remove_teacher_role`, user?.token)
+  //       .then(({ data }) => {
+  //         setLoading(false);
+  //         setValue();
+  //         toast.info(data?.message || "Success");
+  //         getReport(true);
+  //       })
+  //       .catch((err) => {
+  //         setLoading(false);
+  //         toast.error(JSON.stringify(err?.message || err?.response));
+  //         console.log(err, "err");
+  //       });
+  //   }
+  // };
 
   const Rows = function () {
     return data?.map((element) => {
@@ -242,8 +260,8 @@ export default function TableComponent({ data, user, getReport, lessons }) {
           </Modal>
           <Table.Tr key={element?.id}>
             <Table.Td>{element?.id}</Table.Td>
-            <Table.Td>{element?.name}</Table.Td>
-            <Table.Td>{element?.surname}</Table.Td>
+            <Table.Td>{element?.first_name}</Table.Td>
+            <Table.Td>{element?.last_name}</Table.Td>
             <Table.Td>{element?.email}</Table.Td>
             <Table.Td>
               <Select
@@ -265,7 +283,9 @@ export default function TableComponent({ data, user, getReport, lessons }) {
                 }
               />
             </Table.Td>
-            <Table.Td>{element?.teacher ? "Teacher" : "Student"}</Table.Td>
+            <Table.Td style={{ textTransform: "capitalize" }}>
+              {element?.role?.name}
+            </Table.Td>
             <Table.Td>
               <Flex gap="sm">
                 <Button
@@ -273,10 +293,9 @@ export default function TableComponent({ data, user, getReport, lessons }) {
                   color="blue"
                   onClick={() => {
                     form.setValues({
-                      name: element?.name || "",
-                      surname: element?.surname || "",
+                      first_name: element?.first_name || "",
+                      last_name: element?.last_name || "",
                       email: element?.email || "",
-                      teacher: String(Boolean(element?.teacher)) || "",
                     });
                     setID(element?.id);
                     setOpen(true);
@@ -314,18 +333,28 @@ export default function TableComponent({ data, user, getReport, lessons }) {
 
   return (
     <>
-      <Modal opened={open} onClose={() => setOpen(false)} title="Edit user">
+      <Modal
+        opened={open}
+        onClose={() => {
+          form.reset();
+          setOpen(false);
+        }}
+        title="Edit user"
+      >
         <form onSubmit={form.onSubmit(onSubmit)}>
           <Input.Wrapper label="Name">
-            <Input {...form.getInputProps("name")} />
+            <Input {...form.getInputProps("first_name")} />
           </Input.Wrapper>
           <Input.Wrapper label="Surname">
-            <Input {...form.getInputProps("surname")} />
+            <Input {...form.getInputProps("last_name")} />
           </Input.Wrapper>
           <Input.Wrapper label="E-mail">
             <Input {...form.getInputProps("email")} />
           </Input.Wrapper>
-          <Select
+          <Input.Wrapper label="Password">
+            <PasswordInput {...form.getInputProps("password")} />
+          </Input.Wrapper>
+          {/* <Select
             label="Role"
             data={[
               {
@@ -345,7 +374,7 @@ export default function TableComponent({ data, user, getReport, lessons }) {
             }}
             allowDeselect={false}
             rightSection={loading ? <Loader size={"xs"} color="gray" /> : null}
-          />
+          /> */}
           <Group justify="flex-end" mt={"sm"}>
             <Button type="submit" loading={loading}>
               Update

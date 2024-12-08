@@ -21,14 +21,14 @@ const Students = () => {
     (update) => {
       if (!update) return;
       dispatch(setLoader(true));
-      getRequest("/users", user?.token)
+      getRequest("/user/all", user?.token)
         .then(({ data }) => {
           dispatch(setLoader(false));
           dispatch(
             setReport(
-              data
+              data?.result
                 ?.filter((users) => users?.id !== user?.id)
-                ?.sort((a, b) => a?.teacher - b?.teacher)
+                ?.sort((a, b) => a?.role?.id - b?.role?.id)
             )
           );
         })
