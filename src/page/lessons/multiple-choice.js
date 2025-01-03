@@ -10,15 +10,14 @@ import {
   Textarea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useUser } from "../../redux/selectors";
-import {
-  deleteRequest,
-  getRequest,
-  postRequest,
-  putRequest,
-} from "../../services/api";
+// import { useUser } from "../../redux/selectors";
+import // deleteRequest,
+// getRequest,
+// postRequest,
+// putRequest,
+"../../services/api";
 import { PenIcon, Trash } from "../../components/icon";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 
 const inputs = [
   {
@@ -32,6 +31,9 @@ const inputs = [
   },
   {
     name: "d",
+  },
+  {
+    name: "e",
   },
 ];
 
@@ -50,72 +52,74 @@ const FormCard = ({
       return answ?.correct ? { ...answ, index } : false;
     })
     ?.filter(Boolean)[0];
-  const user = useUser();
-  const [loading, setLoading] = useState(false);
-  const [loadingDelete, setLoadingDelete] = useState(false);
+  // const user = useUser();
+  // const [loading, setLoading] = useState(false);
+  // const [loadingDelete, setLoadingDelete] = useState(false);
   const form = useForm({
     initialValues: {
-      question: forms?.content || "",
-      a: forms?.answers?.sort((a, b) => a?.id - b?.id)[0]?.content || "",
-      b: forms?.answers?.sort((a, b) => a?.id - b?.id)[1]?.content || "",
-      c: forms?.answers?.sort((a, b) => a?.id - b?.id)[2]?.content || "",
-      d: forms?.answers?.sort((a, b) => a?.id - b?.id)[3]?.content || "",
+      question: forms?.question || "",
+      a: forms?.tests?.[0]?.option || "",
+      b: forms?.tests?.[1]?.option || "",
+      c: forms?.tests?.[2]?.option || "",
+      d: forms?.tests?.[3]?.option || "",
       current: inputs[correct?.index]?.name,
-      a_id: forms?.answers?.sort((a, b) => a?.id - b?.id)[0]?.id || "",
-      b_id: forms?.answers?.sort((a, b) => a?.id - b?.id)[1]?.id || "",
-      c_id: forms?.answers?.sort((a, b) => a?.id - b?.id)[2]?.id || "",
-      d_id: forms?.answers?.sort((a, b) => a?.id - b?.id)[3]?.id || "",
+      a_id: forms?.tests?.[0]?.id || "",
+      b_id: forms?.tests?.[1]?.id || "",
+      c_id: forms?.tests?.[2]?.id || "",
+      d_id: forms?.tests?.[3]?.id || "",
     },
   });
 
   const onUpdate = (values) => {
-    const multiple_question = {
-      content: values.question,
-      answers_attributes: [
-        { content: values.a, correct: values.current === "a", id: values.a_id },
-        { content: values.b, correct: values.current === "b", id: values.b_id },
-        { content: values.c, correct: values.current === "c", id: values.c_id },
-        { content: values.d, correct: values.current === "d", id: values.d_id },
-      ],
-    };
-    setLoading(true);
-    putRequest(
-      `/lessons/${lessonsId}/media_items/${mediaId}/multiple_questions/${choiceId}`,
-      { multiple_question },
-      user?.token
-    )
-      .then(({ data }) => {
-        setLoading(false);
-        handleUpdate(true);
-        console.log(data, "data");
-        toast.success("Updated");
-        form.reset();
-        close();
-      })
-      .catch((err) => {
-        setLoading(false);
-        console.log(err, "err");
-      });
+    close();
+    // const multiple_question = {
+    //   content: values.question,
+    //   answers_attributes: [
+    //     { content: values.a, correct: values.current === "a", id: values.a_id },
+    //     { content: values.b, correct: values.current === "b", id: values.b_id },
+    //     { content: values.c, correct: values.current === "c", id: values.c_id },
+    //     { content: values.d, correct: values.current === "d", id: values.d_id },
+    //   ],
+    // };
+    // setLoading(true);
+    // putRequest(
+    //   `/lessons/${lessonsId}/media_items/${mediaId}/multiple_questions/${choiceId}`,
+    //   { multiple_question },
+    //   user?.token
+    // )
+    //   .then(({ data }) => {
+    //     setLoading(false);
+    //     handleUpdate(true);
+    //     console.log(data, "data");
+    //     toast.success("Updated");
+    //     form.reset();
+    //     close();
+    //   })
+    //   .catch((err) => {
+    //     setLoading(false);
+    //     console.log(err, "err");
+    //   });
   };
 
   const handleDelete = () => {
-    setLoadingDelete(true);
-    deleteRequest(
-      `/lessons/${lessonsId}/media_items/${mediaId}/multiple_questions/${choiceId}`,
-      user?.token
-    )
-      .then(({ data }) => {
-        setLoadingDelete(false);
-        toast.info("Deleted");
-        console.log(data);
-        handleUpdate(true);
-        close();
-      })
-      .catch((err) => {
-        setLoadingDelete(false);
-        console.log(err);
-        toast.info(JSON.stringify(err?.response?.data || "Error"));
-      });
+    close();
+    // setLoadingDelete(true);
+    // deleteRequest(
+    //   `/lessons/${lessonsId}/media_items/${mediaId}/multiple_questions/${choiceId}`,
+    //   user?.token
+    // )
+    //   .then(({ data }) => {
+    //     setLoadingDelete(false);
+    //     toast.info("Deleted");
+    //     console.log(data);
+    //     handleUpdate(true);
+    //     close();
+    //   })
+    //   .catch((err) => {
+    //     setLoadingDelete(false);
+    //     console.log(err);
+    //     toast.info(JSON.stringify(err?.response?.data || "Error"));
+    //   });
   };
   return (
     <form onSubmit={form.onSubmit(onUpdate)}>
@@ -123,12 +127,12 @@ const FormCard = ({
         <summary>
           <Flex align={"center"} justify={"space-between"} mt={"md"}>
             <p>
-              {index + 1}) {forms?.content}
+              {index + 1}) {forms?.question}
             </p>
             <Flex gap={"sm"}>
               <Button
                 onClick={handleDelete}
-                loading={loadingDelete}
+                // loading={loadingDelete}
                 p={"sm"}
                 color="red"
                 style={{
@@ -167,39 +171,40 @@ const FormCard = ({
           }}
           {...form.getInputProps("question")}
         />
-        {forms?.answers
-          ?.sort((a, b) => a?.id - b?.id)
-          ?.map((inp, index) => (
-            <Flex align={"center"} justify={"space-between"} key={inp.content}>
-              <Checkbox
-                type="radio"
-                mt="md"
-                w={55}
-                h={35}
-                labelPosition="left"
-                label={`${inputs[index]?.name})`}
-                value={inputs[index]?.name}
-                onChange={({ target: { checked } }) => {
-                  checked &&
-                    form.setValues({
-                      current: inputs[index]?.name,
-                    });
-                }}
-                checked={form.values.current === inputs[index]?.name}
-              />
-              <TextInput
-                flex={1}
-                required
-                withAsterisk
-                placeholder={"Answer"}
-                rightSectionWidth={120}
-                defaultValue={inp.content}
-                {...form.getInputProps(inputs[index]?.name)}
-              />
-            </Flex>
-          ))}
+        {forms?.tests?.map((inp, index) => (
+          <Flex align={"center"} justify={"space-between"} key={inp.content}>
+            <Checkbox
+              type="radio"
+              mt="md"
+              w={55}
+              h={35}
+              labelPosition="left"
+              label={`${inputs[index]?.name})`}
+              value={inputs[index]?.name}
+              onChange={({ target: { checked } }) => {
+                checked &&
+                  form.setValues({
+                    current: inputs[index]?.name,
+                  });
+              }}
+              checked={inp?.is_correct}
+            />
+            <TextInput
+              flex={1}
+              required
+              withAsterisk
+              placeholder={"Answer"}
+              rightSectionWidth={120}
+              defaultValue={inp.content}
+              {...form.getInputProps(inputs[index]?.name)}
+            />
+          </Flex>
+        ))}
         <Group justify="flex-end" mt="md">
-          <Button type="submit" loading={loading}>
+          <Button
+            type="submit"
+            // loading={loading}
+          >
             Update
           </Button>
         </Group>
@@ -208,12 +213,12 @@ const FormCard = ({
   );
 };
 
-function MultipleChoice({ handleUpdate, close, id }) {
-  const [loading, setLoading] = useState(false);
-  const [mediaId, setMediaId] = useState(null);
-  const [listArray, serListArray] = useState([]);
+function MultipleChoice({ handleUpdate, close, id, defaultValues }) {
+  // const [loading, setLoading] = useState(false);
+  // const [mediaId, setMediaId] = useState(null);
+  const [listArray, setListArray] = useState([]);
 
-  const user = useUser();
+  // const user = useUser();
   const form = useForm({
     initialValues: {
       question: "",
@@ -226,54 +231,58 @@ function MultipleChoice({ handleUpdate, close, id }) {
   });
 
   const onSubmit = (values) => {
-    const multiple_question = {
-      content: values.question,
-      answers_attributes: [
-        { content: values.a, correct: values.current === "a" },
-        { content: values.b, correct: values.current === "b" },
-        { content: values.c, correct: values.current === "c" },
-        { content: values.d, correct: values.current === "d" },
-      ],
-    };
-    setLoading(true);
-    postRequest(
-      `/lessons/${id}/media_items/${mediaId}/multiple_questions`,
-      { multiple_question },
-      user?.token
-    )
-      .then(({ data }) => {
-        setLoading(false);
-        handleUpdate(true);
-        console.log(data, "data");
-        toast.success("Created");
-        form.reset();
-        close();
-      })
-      .catch((err) => {
-        setLoading(false);
-        console.log(err, "err");
-        toast.error(err?.message);
-      });
+    close();
+    // const multiple_question = {
+    //   content: values.question,
+    //   answers_attributes: [
+    //     { content: values.a, correct: values.current === "a" },
+    //     { content: values.b, correct: values.current === "b" },
+    //     { content: values.c, correct: values.current === "c" },
+    //     { content: values.d, correct: values.current === "d" },
+    //   ],
+    // };
+    // setLoading(true);
+    // postRequest(
+    //   `/lessons/${id}/media_items/${mediaId}/multiple_questions`,
+    //   { multiple_question },
+    //   user?.token
+    // )
+    //   .then(({ data }) => {
+    //     setLoading(false);
+    //     handleUpdate(true);
+    //     console.log(data, "data");
+    //     toast.success("Created");
+    //     form.reset();
+    //     close();
+    //   })
+    //   .catch((err) => {
+    //     setLoading(false);
+    //     console.log(err, "err");
+    //     toast.error(err?.message);
+    //   });
   };
 
   useEffect(() => {
-    setLoading(true);
-    getRequest(`/lessons/${id}`, user?.token)
-      .then(({ data }) => {
-        setMediaId(data?.media_items?.id);
-        setLoading(false);
-        serListArray(data?.media_items?.multiple_questions);
-      })
-      .catch((error) => {
-        setLoading(false);
-        console.log(error, "error");
-      });
+    // setLoading(true);
+    // getRequest(`/lessons/${id}`, user?.token)
+    //   .then(({ data }) => {
+    //     setMediaId(data?.media_items?.id);
+    //     setLoading(false);
+    setListArray(defaultValues);
+    // })
+    // .catch((error) => {
+    //   setLoading(false);
+    //   console.log(error, "error");
+    // });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, user?.token]);
+  }, [
+    defaultValues,
+    // id, user?.token
+  ]);
 
   return (
     <Box mx="auto">
-      <form onSubmit={form.onSubmit(onSubmit)}>
+      <form hidden onSubmit={form.onSubmit(onSubmit)}>
         <Textarea
           flex={1}
           label={"Question"}
@@ -318,7 +327,10 @@ function MultipleChoice({ handleUpdate, close, id }) {
         ))}
 
         <Group justify="flex-end" mt="md">
-          <Button type="submit" loading={loading}>
+          <Button
+            type="submit"
+            // loading={loading}
+          >
             Create
           </Button>
         </Group>
@@ -327,7 +339,7 @@ function MultipleChoice({ handleUpdate, close, id }) {
         <FormCard
           key={forms?.id}
           forms={forms}
-          mediaId={mediaId}
+          // mediaId={mediaId}
           lessonsId={id}
           handleUpdate={handleUpdate}
           choiceId={forms?.id}

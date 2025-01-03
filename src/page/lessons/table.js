@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Menu, Table, Flex, Text } from "@mantine/core";
+import { Button, Menu, Table, Flex, Text, Tooltip } from "@mantine/core";
 import { PenIcon, Trash } from "../../components/icon";
 import ModalScreen from "../../components/modal";
 import FormCreate from "./form";
@@ -63,7 +63,11 @@ export default function TableComponent({
         <Table.Td>
           <ModalScreen
             disabledBtn={!element?.translations?.length}
-            popupBtn={"Media Item Not Found"}
+            popupBtn={`${
+              element?.translations?.length
+                ? "Click to open"
+                : "Translation Not Found"
+            }`}
             title={"Translation"}
             btn_title={<PenIcon fill={"#fff"} />}
             body={({ close }) => (
@@ -94,8 +98,8 @@ export default function TableComponent({
         </Table.Td>
         <Table.Td>
           <ModalScreen
-            disabledBtn={!element?.media_items?.id}
-            popupBtn={"Media Item Not Found"}
+            disabledBtn={!element?.tests?.length}
+            popupBtn={element?.tests?.length ? "Click to open" : "No Data"}
             title={"Multiple Choice"}
             btn_title={<PenIcon fill={"#fff"} />}
             body={({ close }) => (
@@ -104,6 +108,7 @@ export default function TableComponent({
                 setLoader={(boolean) => setLoader(boolean)}
                 close={close}
                 id={element?.id}
+                defaultValues={element?.tests}
               />
             )}
           />
@@ -117,9 +122,15 @@ export default function TableComponent({
               position="left-start"
             >
               <Menu.Target>
-                <Button color={"red"}>
-                  <Trash fill={"#fff"} />
-                </Button>
+                <Tooltip
+                  label={"Delete"}
+                  position={"top"}
+                  withArrow
+                >
+                  <Button color={"red"}>
+                    <Trash fill={"#fff"} />
+                  </Button>
+                </Tooltip>
               </Menu.Target>
               <Menu.Dropdown>
                 <Menu.Label>
